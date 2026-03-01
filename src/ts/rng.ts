@@ -43,7 +43,7 @@ export class SeededRandom {
   gauss(mean = 0, std = 1): number {
     // Box-Muller transform
   
-    const u1 = this.random(),
+    const u1 = this.random() || Number.MIN_VALUE,
           u2 = this.random(),
           z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
   
