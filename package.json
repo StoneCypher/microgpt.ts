@@ -1,0 +1,45 @@
+{
+  "name": "microgpt.ts",
+  "version": "0.3.0",
+  "description": "A conversion of Karpathy's MicroGPT to Typescript",
+  "keywords": [
+    "microgpt",
+    "microgpt.ts",
+    "gpt",
+    "self-contained",
+    "llm",
+    "stonecypher"
+  ],
+  "homepage": "https://github.com/StoneCypher/microgpt.ts#readme",
+  "bugs": {
+    "url": "https://github.com/StoneCypher/microgpt.ts/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/StoneCypher/microgpt.ts.git"
+  },
+  "license": "MIT",
+  "author": "John Haugeland <stonecypher@gmail.com>",
+  "type": "module",
+  "module": "dist/index.cjs",
+  "main": "dist/index.mjs",
+  "browser": "dist/index.iife.js",
+  "scripts": {
+    "clean": "rimraf docs && mkdir docs && rimraf build && mkdir build && rimraf dist && mkdir dist && cd src && cd ts && rimraf generated_code && mkdir generated_code && cd .. && cd ..",
+    "typescript": "tsc --build tsconfig.json",
+    "rollup": "rollup -c",
+    "site": "cp -r ./src/html/* ./docs && cp ./src/html/.nojekyll ./docs",
+    "test": "vitest run --coverage",
+    "build": "npm run clean && npm run test && npm run typescript && npm run rollup && npm run site"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^29.0.0",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-replace": "^6.0.3",
+    "@vitest/coverage-v8": "^4.0.16",
+    "rimraf": "^6.1.3",
+    "rollup": "^4.57.1",
+    "rollup-plugin-polyfill-node": "^0.13.0",
+    "typescript": "^5.9.3"
+  }
+}
