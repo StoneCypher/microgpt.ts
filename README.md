@@ -14,8 +14,10 @@ As I understand it, Karpathy's purpose was to help make this easier to learn.  I
 ## How to read this
 There are two ways to read this.
 
-1. You could do this Karpathy-style.  There is [a single-file TS GPT](TODO) in this repository.
-2. You could do this community-style.  There is a [modular GPT](TODO) in this repository too.
+1. You could do this Karpathy-style.  There is [a single-file TS GPT](https://github.com/StoneCypher/microgpt.ts/blob/main/src/one_file_ts/microgpt.ts) in this repository.
+2. You could do this community-style.  There is a [modular GPT](https://github.com/StoneCypher/microgpt.ts/blob/main/src/ts/index.ts) in this repository too.
+
+Or you could
 
 &nbsp;
 
@@ -23,6 +25,4 @@ There are two ways to read this.
 
 It's around 450 lines of code.  Chewing that down in one piece really suits a lot of people.  Other people don't want to think about, say, the random number generator while they're trying to learn Adam, or whatever.
 
-The community style just takes the code and breaks it up into a couple of files - one for the randomizer, one for ADAM, et cetera.
-
-I provide it unified for the first group, and modularized for the second group.  The main difference is whether it's split up, and that the split up version has longer docblock documentation (in the single file version the docblock comments were overwhelming.)  Also, I changed the entrypoint name to `index` in the modular version, and added unit tests, because some people find reading unit tests helps them understand.
+The community style just takes the code and breaks it up into a couple of files - one for the tokenizer, one for the randomizer, one for autograd, et cetera - then adds docblock comments and tests.

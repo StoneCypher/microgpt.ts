@@ -1,6 +1,6 @@
 {
   "name": "microgpt.ts",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "description": "A conversion of Karpathy's MicroGPT to Typescript",
   "keywords": [
     "microgpt",
