@@ -1,6 +1,6 @@
 {
   "name": "microgpt.ts",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "description": "A conversion of Karpathy's MicroGPT to Typescript",
   "keywords": [
     "microgpt",
@@ -28,9 +28,10 @@
     "clean": "rimraf docs && mkdir docs && rimraf build && mkdir build && rimraf dist && mkdir dist && cd src && cd ts && rimraf generated_code && mkdir generated_code && cd .. && cd ..",
     "typescript": "tsc --build tsconfig.json",
     "rollup": "rollup -c",
-    "site": "cp -r ./src/html/* ./docs && cp ./src/html/.nojekyll ./docs",
+    "site": "cp -r ./src/html/* ./docs && cp ./src/html/.nojekyll ./docs && cp ./dist/index.mjs ./docs/index.mjs",
     "test": "vitest run --coverage",
-    "build": "npm run clean && npm run test && npm run typescript && npm run rollup && npm run site"
+    "build": "npm run clean && npm run test && npm run typescript && npm run rollup && npm run site",
+    "local": "servehere -d docs -c"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^29.0.0",
@@ -40,6 +41,7 @@
     "rimraf": "^6.1.3",
     "rollup": "^4.57.1",
     "rollup-plugin-polyfill-node": "^0.13.0",
+    "servehere": "^1.10.1",
     "typescript": "^5.9.3"
   }
 }

@@ -3,7 +3,7 @@ describe('test rig is running', () => {
         expect(2 + 2).toBe(4);
     });
 });
-import { Value, SeededRandom, linear, softmax, rms_norm, buildTokenizer, tokenize, createStateDict, gpt, trainStep, createAdamState, generate, } from '../index';
+import { Value, SeededRandom, linear, softmax, rms_norm, buildTokenizer, tokenize, createStateDict, gpt, trainStep, createAdamState, generate, train, } from '../index';
 describe('SeededRandom', () => {
     test('produces deterministic output for the same seed', () => {
         const a = new SeededRandom(42);
@@ -194,6 +194,11 @@ describe('tokenizer', () => {
         const tokens = tokenize('ab', uchars, BOS);
         expect(tokens).toEqual([BOS, 0, 1, BOS]);
     });
+    test('tokenize handles undefined doc', () => {
+        const { uchars, BOS } = buildTokenizer(['ab']);
+        const tokens = tokenize(undefined, uchars, BOS);
+        expect(tokens).toEqual([BOS, BOS]);
+    });
 });
 describe('GPT integration', () => {
     const config = { nLayer: 1, nEmbd: 4, blockSize: 4, nHead: 2 };
@@ -236,5 +241,106 @@ describe('GPT integration', () => {
         const { stateDict } = createStateDict(vocabSize, config, rng);
         const result = generate(stateDict, config, uchars, BOS, new SeededRandom(7));
         expect(typeof result).toBe('string');
+    });
+});
+describe('SeededRandom edge cases', () => {
+    test('gauss() uses MIN_VALUE fallback when random() returns 0', () => {
+        const rng = new SeededRandom(0);
+        let callCount = 0;
+        vi.spyOn(rng, 'random').mockImplementation(() => {
+            callCount++;
+            return callCount === 1 ? 0 : 0.5;
+        });
+        const result = rng.gauss(0, 1);
+        expect(Number.isFinite(result)).toBe(true);
+        vi.restoreAllMocks();
+    });
+});
+describe('train()', () => {
+    const docs = ['abc', 'bca', 'cab'];
+    const tiny = {
+        nLayer: 1, nEmbd: 4, blockSize: 4, nHead: 2,
+    };
+    test('throws when docs is undefined', async () => {
+        await expect(train({ ...tiny, docs: undefined })).rejects.toThrow('Must define docs');
+    });
+    test('throws when docs is not an array', async () => {
+        await expect(train({ ...tiny, docs: 'not an array' })).rejects.toThrow('Docs must be an array');
+    });
+    test('returns final samples as string[]', async () => {
+        const result = await train({ ...tiny, docs, numSteps: 5, commentNthStep: 5, sampleCount: 2 });
+        expect(result).toHaveLength(2);
+        for (const s of result) {
+            expect(typeof s).toBe('string');
+        }
+    });
+    test('uses defaults when optional fields are omitted', async () => {
+        const result = await train({ docs, ...tiny, numSteps: 1, commentNthStep: 1, sampleCount: 1 });
+        expect(result).toHaveLength(1);
+    });
+    test('calls onStep every step with loss', async () => {
+        const updates = [];
+        await train({
+            ...tiny, docs, numSteps: 6, commentNthStep: 3, sampleCount: 1,
+            onStep(u) { updates.push(u); },
+        });
+        expect(updates.map(u => u.step)).toEqual([0, 1, 2, 3, 4, 5]);
+        for (const u of updates) {
+            expect(Number.isFinite(u.loss)).toBe(true);
+            expect(u.numSteps).toBe(6);
+        }
+    });
+    test('onStep provides samples only on commentNthStep intervals', async () => {
+        const sampleCounts = [];
+        await train({
+            ...tiny, docs, numSteps: 6, commentNthStep: 3, sampleCount: 2,
+            onStep(u) { sampleCounts.push(u.samples.length); },
+        });
+        expect(sampleCounts).toEqual([2, 0, 0, 2, 0, 0]);
+    });
+    test('samples are non-empty strings on comment steps', async () => {
+        const samples = [];
+        await train({
+            ...tiny, docs, numSteps: 3, commentNthStep: 3, sampleCount: 3,
+            onStep(u) { if (u.samples.length > 0)
+                samples.push(u.samples); },
+        });
+        expect(samples).toHaveLength(1);
+        for (const s of samples[0]) {
+            expect(typeof s).toBe('string');
+        }
+    });
+    test('signal.aborted stops training early', async () => {
+        const signal = { aborted: false };
+        const steps = [];
+        await train({
+            ...tiny, docs, numSteps: 100, commentNthStep: 10, sampleCount: 1,
+            signal,
+            onStep(u) {
+                steps.push(u.step);
+                if (u.step >= 2)
+                    signal.aborted = true;
+            },
+        });
+        expect(steps.length).toBeLessThan(100);
+        expect(steps[steps.length - 1]).toBeLessThanOrEqual(3);
+    });
+    test('signal already aborted runs zero steps', async () => {
+        const steps = [];
+        const result = await train({
+            ...tiny, docs, numSteps: 10, commentNthStep: 1, sampleCount: 1,
+            signal: { aborted: true },
+            onStep(u) { steps.push(u.step); },
+        });
+        expect(steps).toHaveLength(0);
+        expect(result).toHaveLength(1);
+    });
+    test('loss decreases over training', async () => {
+        const losses = [];
+        await train({
+            ...tiny, docs, numSteps: 20, commentNthStep: 10, sampleCount: 1,
+            onStep(u) { losses.push(u.loss); },
+        });
+        expect(losses[losses.length - 1]).toBeLessThan(losses[0]);
     });
 });

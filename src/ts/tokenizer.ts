@@ -50,6 +50,6 @@ export function buildTokenizer(docs: string[]): {
  * @returns  Array of token ids: `[BOS, ...charIds, BOS]`.
  */
 
-export function tokenize(doc: string, uchars: string[], BOS: number): number[] {
-  return [BOS, ...Array.from(doc).map(ch => uchars.indexOf(ch)), BOS];
+export function tokenize(doc: string | undefined, uchars: string[], BOS: number): number[] {
+  return [BOS, ...Array.from(doc ?? '').map(ch => uchars.indexOf(ch)), BOS];
 }

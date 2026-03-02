@@ -9,5 +9,5 @@ export function buildTokenizer(docs) {
     return { uchars, BOS, vocabSize };
 }
 export function tokenize(doc, uchars, BOS) {
-    return [BOS, ...Array.from(doc).map(ch => uchars.indexOf(ch)), BOS];
+    return [BOS, ...Array.from(doc ?? '').map(ch => uchars.indexOf(ch)), BOS];
 }

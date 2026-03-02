@@ -3,12 +3,188 @@
 
   <head>
     <meta charset="UTF-8"/>
-    <script src="usage.js" type="module"></script>
-    <link rel="stylesheet" href="usage.css"/>
+    <title>MicroGPT.ts — Train</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Sans:wght@300;500;600;700&display=swap" rel="stylesheet">
+    <style>
+      body {
+        margin: 0;
+        padding: 2em 3em;
+        background-color: #F2E7CB;
+        font-family: "Fira Sans", sans-serif;
+        color: #333;
+      }
+
+      h1 { font-weight: 700; margin: 0 0 0.25em; }
+      h2 { font-weight: 600; margin: 1.5em 0 0.5em; }
+
+      p, label, li { font-weight: 300; }
+
+      .subtitle { font-weight: 300; margin: 0 0 1.5em; color: #666; }
+
+      /* File upload */
+      .file-section { margin-bottom: 1.5em; }
+
+      .file-input-label {
+        display: inline-block;
+        padding: 0.5em 1.2em;
+        background: #5a7d5a;
+        color: white;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 0.95em;
+      }
+      .file-input-label:hover { background: #4a6d4a; }
+
+      #fileInput { display: none; }
+
+      #fileList {
+        margin-top: 0.5em;
+        font-weight: 300;
+        font-size: 0.9em;
+        color: #555;
+      }
+
+      /* Config */
+      .config-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+        gap: 0.75em 1.5em;
+        margin-bottom: 1.5em;
+      }
+
+      .config-grid label {
+        display: flex;
+        flex-direction: column;
+        font-size: 0.85em;
+        font-weight: 500;
+        color: #555;
+      }
+
+      .config-grid input {
+        margin-top: 0.25em;
+        padding: 0.4em 0.5em;
+        border: 1px solid #bbb;
+        border-radius: 3px;
+        font-family: inherit;
+        font-size: 1em;
+        background: white;
+      }
+
+      /* Train button */
+      #trainBtn {
+        padding: 0.6em 2em;
+        background: #3a6ea5;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+      }
+      #trainBtn:hover:not(:disabled) { background: #2d5a8a; }
+      #trainBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      #stopBtn {
+        padding: 0.6em 2em;
+        background: #a53a3a;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-family: inherit;
+        font-size: 1em;
+        font-weight: 600;
+        cursor: pointer;
+        margin-left: 0.5em;
+      }
+      #stopBtn:hover:not(:disabled) { background: #8a2d2d; }
+      #stopBtn:disabled { opacity: 0.5; cursor: not-allowed; }
+
+      /* Status */
+      #status {
+        margin: 1em 0;
+        font-weight: 500;
+        font-size: 0.95em;
+        color: #444;
+        min-height: 1.4em;
+      }
+
+      /* Chart */
+      #lossCanvas {
+        display: block;
+        width: 100%;
+        max-width: 700px;
+        height: 300px;
+        background: white;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+
+      /* Samples */
+      #samplesPanel {
+        margin-top: 1em;
+        max-width: 700px;
+      }
+
+      #samplesPanel .sample {
+        padding: 0.4em 0.7em;
+        margin: 0.3em 0;
+        background: white;
+        border: 1px solid #ddd;
+        border-radius: 3px;
+        font-family: monospace;
+        font-size: 0.9em;
+        white-space: pre-wrap;
+        word-break: break-all;
+      }
+    </style>
   </head>
 
   <body>
-    TODO
+
+    <h1>MicroGPT.ts</h1>
+    <p class="subtitle">Character-level GPT training in the browser</p>
+
+    <!-- File upload -->
+    <div class="file-section">
+      <label class="file-input-label">
+        Upload .txt files
+        <input type="file" id="fileInput" multiple accept=".txt">
+      </label>
+      <div id="fileList">No files loaded.</div>
+    </div>
+
+    <!-- Config controls -->
+    <h2>Configuration</h2>
+    <div class="config-grid">
+      <label>Steps       <input type="number" id="cfgSteps"          value="1000" min="1"></label>
+      <label>Report every <input type="number" id="cfgCommentNth"    value="100"  min="1"></label>
+      <label>Samples      <input type="number" id="cfgSampleCount"   value="10"   min="1"></label>
+      <label>Layers       <input type="number" id="cfgNLayer"        value="1"    min="1"></label>
+      <label>Embed dim    <input type="number" id="cfgNEmbd"         value="16"   min="1"></label>
+      <label>Block size   <input type="number" id="cfgBlockSize"     value="16"   min="1"></label>
+      <label>Heads        <input type="number" id="cfgNHead"         value="4"    min="1"></label>
+      <label>Learn rate   <input type="number" id="cfgLR"            value="0.01" step="0.001" min="0"></label>
+      <label>Temperature  <input type="number" id="cfgTemp"          value="0.5"  step="0.1" min="0.01" max="2"></label>
+    </div>
+
+    <button id="trainBtn" disabled>Train</button>
+    <button id="stopBtn" disabled>Stop</button>
+
+    <div id="status"></div>
+
+    <!-- Loss chart -->
+    <h2>Loss</h2>
+    <canvas id="lossCanvas"></canvas>
+
+    <!-- Samples -->
+    <h2>Samples</h2>
+    <div id="samplesPanel"><em>Samples will appear here during training.</em></div>
+
+    <script src="usage.js" type="module"></script>
   </body>
 
 </html>
