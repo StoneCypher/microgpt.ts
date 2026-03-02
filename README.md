@@ -25,4 +25,10 @@ Or you could
 
 It's around 450 lines of code.  Chewing that down in one piece really suits a lot of people.  Other people don't want to think about, say, the random number generator while they're trying to learn Adam, or whatever.
 
-The community style just takes the code and breaks it up into a couple of files - one for the tokenizer, one for the randomizer, one for autograd, et cetera - then adds docblock comments and tests.
+The community style just takes the code and breaks it up into a couple of files - one for the tokenizer, one for the randomizer, one for autograd, et cetera - then adds docblock comments and tests.  Community style also adds a single function called `test` to `index`, which shows a person how these library calls are made.
+
+&nbsp;
+
+## How to use this
+
+Well, generally use a production GPT.  This is correct, but it doesn't do any of the fancy stuff that gives you real speed.  However, for learning purposes, [we've included a web GUI that does this live](https://stonecypher.github.io/microgpt.ts/usage.html).

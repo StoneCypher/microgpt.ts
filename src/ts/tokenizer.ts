@@ -12,6 +12,7 @@
  * Build a character-level tokenizer from a list of documents.
  *
  * @param docs  Array of document strings.
+ * 
  * @returns  `uchars` (sorted unique characters), `BOS` token id, and `vocabSize`.
  */
 
@@ -45,6 +46,7 @@ export function buildTokenizer(docs: string[]): {
  * @param doc     The document string.
  * @param uchars  Sorted unique characters (from {@link buildTokenizer}).
  * @param BOS     The BOS token id.
+ * 
  * @returns  Array of token ids: `[BOS, ...charIds, BOS]`.
  */
 

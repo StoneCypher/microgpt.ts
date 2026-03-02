@@ -10,7 +10,7 @@ export class SeededRandom {
         return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
     }
     gauss(mean = 0, std = 1) {
-        const u1 = this.random(), u2 = this.random(), z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
+        const u1 = this.random() || Number.MIN_VALUE, u2 = this.random(), z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
         return mean + z * std;
     }
     shuffle(arr) {
