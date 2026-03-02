@@ -7,7 +7,10 @@ Not everybody has Python as a preferred language, so, I decided to convert it to
 
 As I understand it, Karpathy's purpose was to help make this easier to learn.  I'm just trying to bring his work to a wider reading audience.
 
-`TODO LINKS`: try, code, docs, build, CI runs
+* 💻 [Try it](https://stonecypher.github.io/microgpt.ts/usage.html), or
+* 🔍 [Read the code](https://github.com/StoneCypher/microgpt.ts/blob/main/src/ts/index.ts), or
+* 👓 [Read the docs](https://stonecypher.github.io/microgpt.ts/docs/), or 
+* 🏗️ [See the builds]()
 
 &nbsp;
 
@@ -31,4 +34,12 @@ The community style just takes the code and breaks it up into a couple of files 
 
 ## How to use this
 
-Well, generally use a production GPT.  This is correct, but it doesn't do any of the fancy stuff that gives you real speed.  However, for learning purposes, [we've included a web GUI that does this live](https://stonecypher.github.io/microgpt.ts/usage.html).
+Well, generally use a production GPT.  This is correct, but it doesn't do any of the fancy stuff that gives you real speed.  However, for learning purposes, [we've included a web GUI that does this live](https://stonecypher.github.io/microgpt.ts/usage.html).  There's a copy of Karpathy's "tiny shakespeare" to train on in `src/html`.
+
+Alternately, you can download it and run it locally.  If you do, please use `npm run local` to start a local webserver, then hit the page at [https://localhost:4400/usage.html](localhost:4400/usage.html), instead of loading locally from a `file` url; `file://` has CORS consequences, and you won't be able to upload your text trainer.
+
+&nbsp;
+
+## How to contribute
+
+Patches, features, and bugfixes are accepted graciously.  It's easier to accept a PR that has a description, so I know what it does.  Please fork the repo and send a PR back from your fork.
